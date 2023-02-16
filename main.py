@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-import import_ipynb
 from algorithm.recommendation_algorithm_V5 import recommend_books
 
 app = Flask(__name__)
