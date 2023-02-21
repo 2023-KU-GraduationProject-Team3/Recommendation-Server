@@ -23,4 +23,4 @@ def recommendation():
         return jsonify({"message": "Success! Request method is GET!"}), 200
 
 if __name__ == "__main__":
-    app.run(host = '127.0.0.1', port=8080)
+    app.run(host = 'http://localhost/', port=8080)
