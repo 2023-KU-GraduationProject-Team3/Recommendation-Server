@@ -160,7 +160,7 @@ def content_algorithm(favorites, n):
     top_n = [i[0] for i in sim_scores[len(favorites) : n + len(favorites)]]
 
     # 가장 유사도 높은 n개의 책 가져오기
-    return df.iloc[top_n].to_json(orient="index", force_ascii=False, pretty = True)
+    return df.iloc[top_n].to_json(orient="index", force_ascii=False)
 
 
 # 함수 호출
