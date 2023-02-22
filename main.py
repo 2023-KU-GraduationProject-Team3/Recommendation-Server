@@ -1,26 +1,39 @@
 from flask import Flask, request, jsonify
-from algorithm.recommendation_algorithm_V5 import recommend_books
+from algorithm.recommendation_algorithm_V5 import content_algorithm
+from algorithm.recommendation_algorithm_V5 import collab_algorithm
 
 app = Flask(__name__)
-
-@app.route("/api", methods=["GET", "POST"])
 
 # Headers는 'Content-Type': 'application/json'
 # Body는 JSON 형식으로 요청
 
-def recommendation():
-
+@app.route("/api/content", methods=["GET", "POST"])
+def content():
     if request.method == "POST":
         data = request.get_json()
         isbn_num = int(data.get("isbn13"))
-        result = recommend_books([isbn_num], 50)
+        content_result = content_algorithm([isbn_num], 50)
 
         if isbn_num:
-            return jsonify(result), 201
+            return jsonify(content_result), 201
+        else:
+            return jsonify({"message": "Error"}), 400
+    else:
+        return jsonify({"message": "Success! Request method is GET!"}), 200
+
+@app.route("/api/collab", methods=["GET", "POST"])
+def collab():
+    if request.method == "POST":
+        data = request.get_json()
+        user_id = int(data.get("user_id"))
+        collab_result = collab_algorithm(user_id, 3)
+
+        if user_id:
+            return jsonify(collab_result), 201
         else:
             return jsonify({"message": "Error"}), 400
     else:
         return jsonify({"message": "Success! Request method is GET!"}), 200
 
 if __name__ == "__main__":
-    app.run(host = 'http://localhost/', port=8080)
+    app.run(host = '0.0.0.0', port=5000)
