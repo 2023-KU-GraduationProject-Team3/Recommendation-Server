@@ -14,7 +14,7 @@ def content():
 
         data = request.get_json()
         isbn_num = int(data.get("isbn13"))
-        content_result = content_algorithm([isbn_num], 50)
+        content_result = content_algorithm([isbn_num], 10)
 
         if isbn_num:
             return content_result, 201
@@ -39,7 +39,7 @@ def collab():
 
         data = request.get_json()
         user_id = int(data.get("user_id"))
-        collab_result = collab_algorithm(user_id, 3)
+        collab_result = collab_algorithm(user_id, 5)
 
         if user_id:
             return collab_result, 201
