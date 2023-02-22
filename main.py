@@ -3,6 +3,7 @@ from algorithm.recommendation_algorithm_V5 import content_algorithm
 from algorithm.recommendation_algorithm_V5 import collab_algorithm
 
 app = Flask(__name__)
+app.config['JSON_AS_ASCII'] = False
 
 # Headers는 'Content-Type': 'application/json'
 # Body는 JSON 형식으로 요청
@@ -16,7 +17,7 @@ def content():
         content_result = content_algorithm([isbn_num], 50)
 
         if isbn_num:
-            return jsonify(content_result), 201
+            return content_result, 201
         else:
             return jsonify({"message": "Failed to bring data"}), 400
 
@@ -26,7 +27,7 @@ def content():
         content_result = content_algorithm([isbn_num], 50)
 
         if isbn_num:
-            return jsonify(content_result), 201
+            return content_result, 201
         else:
             return jsonify({"message": "Failed to bring data"}), 400
     else:
@@ -41,7 +42,7 @@ def collab():
         collab_result = collab_algorithm(user_id, 3)
 
         if user_id:
-            return jsonify(collab_result), 201
+            return collab_result, 201
         else:
             return jsonify({"message": "Failed to bring data"}), 400
 
@@ -51,7 +52,7 @@ def collab():
         collab_result = collab_algorithm(user_id, 3)
 
         if user_id:
-            return jsonify(collab_result), 201
+            return collab_result, 201
         else:
             return jsonify({"message": "Failed to bring data"}), 400
     else:
