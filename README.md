@@ -10,4 +10,8 @@
 
 #### pip install scikit-surprise
 
+#### pip install requests
+
+#### pip install lxml
+
 #### 설치해야 합니다.
