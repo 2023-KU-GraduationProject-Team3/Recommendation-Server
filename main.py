@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify
-from algorithm.recommendation_algorithm_V5 import content_algorithm
-from algorithm.recommendation_algorithm_V5 import collab_algorithm
+# from algorithm.recommendation_algorithm_V5 import content_algorithm
+# from algorithm.recommendation_algorithm_V5 import collab_algorithm
+from algorithm.content_filtering import content_algorithm
+from algorithm.collab_filtering import collab_algorithm
 from writeCSV import write_csv
 
 app = Flask(__name__)

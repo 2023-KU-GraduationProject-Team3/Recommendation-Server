@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
+from scipy.sparse import hstack
 from surprise import Reader, Dataset, SVD
 import json
 
@@ -63,7 +64,7 @@ def collab_algorithm(user_id, num_books=10):
 def content_algorithm(favorites, n):
 
     # CSV 파일 불러오기
-    df = pd.read_csv("res/popular_books_ISBN3.csv")
+    df = pd.read_csv("res/book_df.csv")
 
     # 작가 이름이 완전히 같은지 체크
     df["same_author"] = df.duplicated(subset="authors", keep=False)
