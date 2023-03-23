@@ -22,12 +22,17 @@ def content():
             return jsonify({"message": "Failed to bring data"}), 400
 
     elif request.method == "GET":
+        isbn_num = -1
+        content_result = -1
 
-        isbn_num = int(request.args.get("isbn_num"))
-        content_result = content_algorithm([isbn_num], 50)
+        if len(request.args) != 0 and request.args.get("isbn_num") is not None:
+            isbn_num = int(request.args.get("isbn_num"))
+            content_result = content_algorithm([isbn_num], 50)
 
-        if isbn_num:
+        if isbn_num >= 0:
             return content_result, 201
+        elif isbn_num < 0:
+            return jsonify("isbn_num 값을 파라미터로 넘기세요."), 201
         else:
             return jsonify({"message": "Failed to bring data"}), 400
     else:
@@ -59,4 +64,4 @@ def collab():
         return jsonify({"message": "Wrong access"}), 200
 
 if __name__ == "__main__":
-    app.run(host = '0.0.0.0', port=5000)
+    app.run(host = '0.0.0.0', port=5000, debug=True)
