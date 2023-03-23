@@ -14,4 +14,6 @@
 
 #### pip install lxml
 
+#### pip install xmltodict
+
 #### 설치해야 합니다.

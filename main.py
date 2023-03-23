@@ -4,11 +4,13 @@ from flask import Flask, request, jsonify
 from algorithm.content_filtering import content_algorithm
 from algorithm.collab_filtering import collab_algorithm
 from writeCSV import write_csv
+from get_book import get_book
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 
 write_csv()
+get_book(9788983921987)
 
 # Headers는 'Content-Type': 'application/json'
 # Body는 JSON 형식으로 요청

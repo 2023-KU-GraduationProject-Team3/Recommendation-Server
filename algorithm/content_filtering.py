@@ -18,7 +18,7 @@ warnings.filterwarnings("ignore")
 
 def content_algorithm(favorites, n):
     # CSV file 가져오기
-    books_df = pd.read_csv('./res/popular_books_ISBN3.csv', dtype={})
+    books_df = pd.read_csv('res/book_df.csv', dtype={})
 
     # 작가 이름이 완전히 같은 것만
     books_df['same_author'] = books_df.apply(lambda x: x['authors'] if x['authors'] == x['authors'] else '', axis=1)
@@ -44,7 +44,7 @@ def content_algorithm(favorites, n):
     tfidf_publisher_matrix = tfidf_publisher.fit_transform(books_df['same_publisher'])
 
     tfidf_class_nm = TfidfVectorizer(stop_words='english')
-    tfidf_class_nm_matrix = tfidf_class_nm.fit_transform(books_df['class_nm'])
+    tfidf_class_nm_matrix = tfidf_class_nm.fit_transform(books_df['class_nm'].values.astype('U'))
 
     # hstack을 이용해서 행렬을 쌓고 가중치 곱하기
     weighted_matrix = hstack([tfidf_bookname_matrix * bookname_weight, tfidf_author_matrix * author_weight,
@@ -56,8 +56,13 @@ def content_algorithm(favorites, n):
     def recommend_books(isbn_array, num_recommendations=10):
         # isbn_array로 받은 ISBN들과 일치하는 책들을 isbn_books에 넣기
         isbn_books = []
+
         for isbn in isbn_array:
             isbn_books.append(books_df[books_df['isbn13'] == isbn].index[0])
+
+        print("책 리스트 데이터에 없는 책을 입력했을 때 오류남. 실제로 베스트 리스트 데이터에 없는 책들이 더 많을 테니까")
+        print(isbn_books)
+        print("888***************")
 
         # 코사인 유사도 계산
         similarities = cosine_similarity(weighted_matrix[isbn_books], weighted_matrix)
@@ -73,8 +78,10 @@ def content_algorithm(favorites, n):
                 'bookname': str(books_df.iloc[i]['bookname']),
                 'authors': str(books_df.iloc[i]['authors']),
                 'publisher': str(books_df.iloc[i]['publisher']),
+                'publication_year': str(books_df.iloc[i]['publication_year']),
                 'class_no': str(books_df.iloc[i]['class_no']),
-                'class_nm': str(books_df.iloc[i]['class_nm'])
+                'class_nm': str(books_df.iloc[i]['class_nm']),
+                'bookImageURL': str(books_df.iloc[i]['bookImageURL'])
             })
         return json.dumps(recommended_books, ensure_ascii=False)
 
