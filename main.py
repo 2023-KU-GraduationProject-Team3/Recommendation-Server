@@ -5,14 +5,17 @@ from algorithm.content_filtering import content_algorithm
 from algorithm.collab_filtering import collab_algorithm
 from writeCSV import write_csv
 from get_book import get_book
-from add_book_to_csv import add_book_to_csv
+from add_book_to_csv import add_book_to_db
+from update_popular_books import update_popular_books
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 
-write_csv()
-get_book(9788983921987)
-add_book_to_csv(9788983921987)
+update_popular_books()
+
+#write_csv()
+#get_book(9788983921987)
+add_book_to_db([9788983921987])
 
 # Headers는 'Content-Type': 'application/json'
 # Body는 JSON 형식으로 요청
@@ -22,14 +25,18 @@ def content():
 
     if request.method == "POST":
 
-        data = request.get_json()
-        isbn = int(data.get("isbn"))
-        content_result = content_algorithm([isbn], 10)
+        try:
+            isbns = request.json['isbn']
+            result_num = request.json.get('result_num', 10)
 
-        if isbn:
-            return content_result, 201
-        else:
-            return jsonify({"message": "Failed to bring data"}), 400
+        except KeyError:
+            return jsonify({'error': 'Invalid request. Parameter "isbn" missing in request body.'}), 400
+
+        print('*****')
+        print(isbns)
+        add_book_to_db(isbns)
+        content_result = content_algorithm(isbns, result_num)
+        return content_result, 201
 
     elif request.method == "GET":
         isbn = -1
