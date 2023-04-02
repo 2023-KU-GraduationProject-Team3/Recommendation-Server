@@ -13,6 +13,6 @@ def get_book(isbn):
 
     jsonObject = json.loads(jsonData)
 
-    print(jsonObject.get("response").get("detail").get("book"))
+    result = jsonObject.get("response").get("detail").get("book")
 
-    return jsonData
+    return result

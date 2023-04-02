@@ -20,6 +20,8 @@ def content_algorithm(favorites, n):
     # CSV file 가져오기
     books_df = pd.read_csv('res/book_df.csv', dtype={})
 
+
+
     # 작가 이름이 완전히 같은 것만
     books_df['same_author'] = books_df.apply(lambda x: x['authors'] if x['authors'] == x['authors'] else '', axis=1)
 
