@@ -3,19 +3,21 @@ from flask import Flask, request, jsonify
 # from algorithm.recommendation_algorithm_V5 import collab_algorithm
 from algorithm.content_filtering import content_algorithm
 from algorithm.collab_filtering import collab_algorithm
+from algorithm.content_filtering_db import content_algorithm_db
 from writeCSV import write_csv
 from get_book import get_book
-from add_book_to_db import add_book_to_db
+from operation_to_db import add_book_to_db, delete_book_from_db
 from update_popular_books import update_popular_books
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 
-update_popular_books()
+update_popular_books(False)
+#print(get_book(9791130627984))
+print("&*&*&*&*")
+print(content_algorithm_db([9791130627984], 10))
 
 #write_csv()
-#get_book(9788983921987)
-add_book_to_db([9788983921987, 9791192300245, 0000000000000])
 
 # Headers는 'Content-Type': 'application/json'
 # Body는 JSON 형식으로 요청
@@ -34,8 +36,11 @@ def content():
 
         print('*****')
         print(isbns)
-        add_book_to_db(isbns)
+        added_books_num = add_book_to_db(isbns)
         content_result = content_algorithm(isbns, result_num)
+
+        delete_book_from_db(200)
+
         return content_result, 201
 
     elif request.method == "GET":

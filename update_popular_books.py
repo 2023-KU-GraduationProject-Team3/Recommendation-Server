@@ -5,7 +5,7 @@ import xmltodict
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
-def update_popular_books():
+def update_popular_books(isForced):
     # Retrieve XML data from API
     url = "http://data4library.kr/api/loanItemSrch?authKey=32bb82a55e2ccb6dd8baec16309bed7ecc2985e9a07e83dc18b5037179636d55&startDt=2023-01-01&endDt=2023-04-01"
     headers = {'Content-Type': 'application/json', 'charset': 'UTF-8', 'Accept': '*/*'}
@@ -40,7 +40,7 @@ def update_popular_books():
     nowdate = datetime.now().date()
 
     # 이전에 업데이트 했던 날짜와 같지 않을 때만 실행
-    if str(cursor.execute('SELECT createdAt from popular_books LIMIT 1').fetchone()[0]) != str(nowdate):
+    if isForced or str(cursor.execute('SELECT createdAt from popular_books LIMIT 1').fetchone()[0]) != str(nowdate):
 
         # 테이블에서 모두 삭제
         cursor.execute('DELETE from popular_books')
