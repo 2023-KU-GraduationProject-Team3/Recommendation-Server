@@ -7,32 +7,36 @@ from datetime import datetime
 
 def add_book_to_db(isbns):
 
-    conn = sqlite3.connect('books.db')
+    conn = sqlite3.connect('res/books.db')
     cursor = conn.cursor()
     nowdate = datetime.now().date()
 
     for isbn in isbns:
 
-        cursor.execute('SELECT COUNT(*) FROM popular_books WHERE isbn = ?', (isbn,))
+        cursor.execute('SELECT COUNT(isbn13) FROM popular_books WHERE isbn13 = ?', (isbn,))
         count = cursor.fetchone()[0]
         # 데이터베이스에 없으면
         if count == 0:
             item = get_book(isbn)
 
-            isbn13 = int(item.get("isbn13"))
-            bookname = item.get("bookname")
-            authors = item.get("authors")
-            publisher = item.get("publisher")
-            class_no = item.get("class_no")
-            class_nm = item.get("class_nm")
-            bookImageURL = item.get("bookImageURL")
-            createdAt = nowdate
-            cursor.execute('''
-                            INSERT INTO popular_books (isbn13, bookname, authors, publisher, class_no, class_nm, bookImageURL, createdAt)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                        ''', (isbn13, bookname, authors, publisher, class_no, class_nm, bookImageURL, createdAt))
+            try:
+                isbn13 = int(item.get("isbn13"))
+                bookname = item.get("bookname")
+                authors = item.get("authors")
+                publisher = item.get("publisher")
+                class_no = item.get("class_no")
+                class_nm = item.get("class_nm")
+                bookImageURL = item.get("bookImageURL")
+                createdAt = nowdate
+                cursor.execute('''
+                                INSERT INTO popular_books (isbn13, bookname, authors, publisher, class_no, class_nm, bookImageURL, createdAt)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                            ''', (isbn13, bookname, authors, publisher, class_no, class_nm, bookImageURL, createdAt))
 
-            print(f'ISBN {isbn} inserted into database')
+                print(f'ISBN {isbn} inserted into database')
+            except Exception as e:
+                print(f"Failed to get ISBN {str(isbn)} from api")
+                return f"Error parsing JSON data: {str(e)}", 400
         # 데이터베이스에 있으면
         else:
             print(f'ISBN {isbn} found in database')

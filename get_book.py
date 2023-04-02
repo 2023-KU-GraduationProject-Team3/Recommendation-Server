@@ -9,10 +9,16 @@ def get_book(isbn):
 
     xml_data = xmltodict.parse(response.text)
 
-    jsonData = json.dumps(xml_data, ensure_ascii=False)
+    try:
 
-    jsonObject = json.loads(jsonData)
+        jsonData = json.dumps(xml_data, ensure_ascii=False)
 
-    result = jsonObject.get("response").get("detail").get("book")
+        jsonObject = json.loads(jsonData)
 
-    return result
+        result = jsonObject.get("response").get("detail").get("book")
+
+        return result
+
+    except Exception as e:
+        print(f"ISBN {str(isbn)} doesn't exist")
+        return f"Error parsing JSON data: {str(e)}", 400

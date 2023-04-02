@@ -5,7 +5,7 @@ from algorithm.content_filtering import content_algorithm
 from algorithm.collab_filtering import collab_algorithm
 from writeCSV import write_csv
 from get_book import get_book
-from add_book_to_csv import add_book_to_db
+from add_book_to_db import add_book_to_db
 from update_popular_books import update_popular_books
 
 app = Flask(__name__)
@@ -15,7 +15,7 @@ update_popular_books()
 
 #write_csv()
 #get_book(9788983921987)
-add_book_to_db([9788983921987])
+add_book_to_db([9788983921987, 9791192300245, 0000000000000])
 
 # Headers는 'Content-Type': 'application/json'
 # Body는 JSON 형식으로 요청
