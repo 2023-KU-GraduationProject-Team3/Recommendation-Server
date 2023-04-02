@@ -10,6 +10,7 @@ from scipy.sparse import hstack
 from surprise import Reader, Dataset, SVD
 import json
 import sqlite3
+from get_book import get_book
 
 from scipy.sparse.linalg import svds
 import warnings
@@ -17,10 +18,24 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
-def content_algorithm_db(favorites, n):
+def content_algorithm_db(favorites, result_num):
     conn = sqlite3.connect('res/books.db')
 
     books_df = pd.read_sql_query('SELECT * FROM popular_books', conn)
+
+    print(books_df)
+
+    for isbn in favorites:
+        book_data = get_book(isbn)
+        try:
+            new_df = [int(book_data.get('isbn13')), book_data.get('bookname'), book_data.get('authors'), book_data.get('publisher'), book_data.get('class_no'), book_data.get('class_nm'), book_data.get('bookImageURL'), '0']
+            print(new_df)
+            books_df.loc[len(books_df)] = new_df
+            print('Book added successfully')
+        except Exception as e:
+            print('Failed to add books to book_df')
+            return e;
+
 
     print(books_df)
 
@@ -50,31 +65,29 @@ def content_algorithm_db(favorites, n):
     weighted_matrix = hstack([tfidf_bookname_matrix * bookname_weight, tfidf_author_matrix * author_weight,
                               tfidf_publisher_matrix * publisher_weight, tfidf_class_nm_matrix * class_nm_weight])
 
-    def recommend_books(isbn_array, num_recommendations=10):
-        # isbn_array로 받은 ISBN들과 일치하는 책들을 isbn_books에 넣기
-        isbn_books = []
 
-        for isbn in isbn_array:
-            isbn_books.append(books_df[books_df['isbn13'] == isbn].index[0])
+    # isbn_array로 받은 ISBN들과 일치하는 책들을 isbn_books에 넣기
+    isbn_books = []
 
-        similarities = cosine_similarity(weighted_matrix[isbn_books], weighted_matrix)
+    for isbn in favorites:
+        isbn_books.append(books_df[books_df['isbn13'] == isbn].index[0])
 
-        similar_indices = similarities.argsort()[0][::-1][1:num_recommendations + 1]
+    similarities = cosine_similarity(weighted_matrix[isbn_books], weighted_matrix)
 
-        recommended_books = []
-        for i in similar_indices:
-            recommended_books.append({
-                'isbn13': int(books_df.iloc[i]['isbn13']),
-                'bookname': str(books_df.iloc[i]['bookname']),
-                'authors': str(books_df.iloc[i]['authors']),
-                'publisher': str(books_df.iloc[i]['publisher']),
-                'class_no': str(books_df.iloc[i]['class_no']),
-                'class_nm': str(books_df.iloc[i]['class_nm']),
-                'bookImageURL': str(books_df.iloc[i]['bookImageURL'])
-            })
-        return json.dumps(recommended_books, ensure_ascii=False)
+    similar_indices = similarities.argsort()[0][::-1][1:result_num + 1]
 
-    return recommend_books(favorites, n)
+    recommended_books = []
+    for i in similar_indices:
+        recommended_books.append({
+            'isbn13': int(books_df.iloc[i]['isbn13']),
+            'bookname': str(books_df.iloc[i]['bookname']),
+            'authors': str(books_df.iloc[i]['authors']),
+            'publisher': str(books_df.iloc[i]['publisher']),
+            'class_no': str(books_df.iloc[i]['class_no']),
+            'class_nm': str(books_df.iloc[i]['class_nm']),
+            'bookImageURL': str(books_df.iloc[i]['bookImageURL'])
+        })
+    return json.dumps(recommended_books, ensure_ascii=False)
 
 
 # 함수 호출

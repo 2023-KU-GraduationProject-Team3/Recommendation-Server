@@ -15,7 +15,7 @@ app.config['JSON_AS_ASCII'] = False
 update_popular_books(False)
 #print(get_book(9791130627984))
 print("&*&*&*&*")
-print(content_algorithm_db([9791130627984], 10))
+print(content_algorithm_db([9791130627984, 9791160022490], 10))
 
 #write_csv()
 
