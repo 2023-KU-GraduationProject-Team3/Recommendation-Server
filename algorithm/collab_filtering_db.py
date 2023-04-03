@@ -2,23 +2,17 @@
 # coding: utf-8
 
 # In[9]:
-import numpy as np
 import pandas as pd
-from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.feature_extraction.text import TfidfVectorizer
-from scipy.sparse import hstack
 from surprise import Reader, Dataset, SVD
 import json
 import sqlite3
 
-from scipy.sparse.linalg import svds
 import warnings
 
 
 warnings.filterwarnings("ignore")
 
 def collab_algorithm_db(user_id, result_num=10):
-
     conn = sqlite3.connect('res/books.db')
 
     # rating csv 파일 일기

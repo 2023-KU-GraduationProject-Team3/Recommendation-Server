@@ -2,12 +2,10 @@ import requests
 import sqlite3
 import json
 import xmltodict
-import xml.etree.ElementTree as ET
 from datetime import datetime
 
 def update_popular_books(isForced):
-
-    # Retrieve XML data from API
+    # XML 데이터 가져오기
     url = "http://data4library.kr/api/loanItemSrch?authKey=32bb82a55e2ccb6dd8baec16309bed7ecc2985e9a07e83dc18b5037179636d55&startDt=2023-01-01&endDt=2023-04-01"
     headers = {'Content-Type': 'application/json', 'charset': 'UTF-8', 'Accept': '*/*'}
     response = requests.get(url, headers=headers)

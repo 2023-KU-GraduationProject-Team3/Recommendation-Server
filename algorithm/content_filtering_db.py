@@ -2,17 +2,14 @@
 # coding: utf-8
 
 # In[9]:
-import numpy as np
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 from scipy.sparse import hstack
-from surprise import Reader, Dataset, SVD
 import json
 import sqlite3
 from get_book import get_book
 
-from scipy.sparse.linalg import svds
 import warnings
 
 
@@ -22,8 +19,6 @@ def content_algorithm_db(favorites, result_num):
     conn = sqlite3.connect('res/books.db')
 
     books_df = pd.read_sql_query('SELECT * FROM popular_books', conn)
-
-    print(books_df)
 
     for isbn in favorites:
         book_data = get_book(isbn)
@@ -35,9 +30,6 @@ def content_algorithm_db(favorites, result_num):
         except Exception as e:
             print('Failed to add books to book_df')
             return e;
-
-
-    print(books_df)
 
     books_df['same_author'] = books_df.apply(lambda x: x['authors'] if x['authors'] == x['authors'] else '', axis=1)
     books_df['same_publisher'] = books_df.apply(lambda x: x['publisher'] if x['publisher'] == x['publisher'] else '', axis=1)
@@ -90,12 +82,3 @@ def content_algorithm_db(favorites, result_num):
 
     conn.close()
     return json.dumps(recommended_books, ensure_ascii=False)
-
-
-# 함수 호출
-# print(recommend_books([9788954622035], 50))
-
-
-# In[ ]:
-
-

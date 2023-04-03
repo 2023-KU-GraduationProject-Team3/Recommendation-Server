@@ -10,11 +10,8 @@ def get_book(isbn):
     xml_data = xmltodict.parse(response.text)
 
     try:
-
         jsonData = json.dumps(xml_data, ensure_ascii=False)
-
         jsonObject = json.loads(jsonData)
-
         result = jsonObject.get("response").get("detail").get("book")
 
         return result
