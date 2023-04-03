@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 
 def update_popular_books(isForced):
+
     # Retrieve XML data from API
     url = "http://data4library.kr/api/loanItemSrch?authKey=32bb82a55e2ccb6dd8baec16309bed7ecc2985e9a07e83dc18b5037179636d55&startDt=2023-01-01&endDt=2023-04-01"
     headers = {'Content-Type': 'application/json', 'charset': 'UTF-8', 'Accept': '*/*'}
@@ -60,11 +61,16 @@ def update_popular_books(isForced):
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ''', (isbn13, bookname, authors, publisher, class_no, class_nm, bookImageURL, createdAt))
 
-        # Commit changes and close connection
-        conn.commit()
-        conn.close()
-
-        return "Data saved successfully!"
+        print("Data saved successfully!")
 
     else:
-        return "No data has been updated. : Same date"
+        print("No data has been updated. : Same date")
+
+    cursor.execute("SELECT COUNT(*) FROM popular_books")
+    popular_books_total_num = cursor.fetchone()[0]
+
+    # Commit changes and close connection
+    conn.commit()
+    conn.close()
+
+    return popular_books_total_num

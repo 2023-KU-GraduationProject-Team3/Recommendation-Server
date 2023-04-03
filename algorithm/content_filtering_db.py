@@ -87,6 +87,8 @@ def content_algorithm_db(favorites, result_num):
             'class_nm': str(books_df.iloc[i]['class_nm']),
             'bookImageURL': str(books_df.iloc[i]['bookImageURL'])
         })
+
+    conn.close()
     return json.dumps(recommended_books, ensure_ascii=False)
 
 
