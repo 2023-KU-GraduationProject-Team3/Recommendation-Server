@@ -1,6 +1,4 @@
 from flask import Flask, request, jsonify
-from algorithm.content_filtering import content_algorithm
-from algorithm.collab_filtering import collab_algorithm
 from algorithm.content_filtering_db import content_algorithm_db
 from algorithm.collab_filtering_db import collab_algorithm_db
 from update_popular_books import update_popular_books

@@ -21,6 +21,21 @@ def collab_algorithm_db(user_id, result_num=10):
     # db에서 도서 정보 불러와 df으로 할당
     books_df = pd.read_sql_query('SELECT * FROM popular_books', conn)
 
+    # cur = conn.cursor()
+    # cur.execute("SELECT attribute FROM MyTable")
+    # values = cur.fetchall()
+
+    # for isbn in favorites:
+    #     book_data = get_book(isbn)
+    #     try:
+    #         new_df = [int(book_data.get('isbn13')), book_data.get('bookname'), book_data.get('authors'), book_data.get('publisher'), book_data.get('class_no'), book_data.get('class_nm'), book_data.get('bookImageURL'), '0']
+    #         print(new_df)
+    #         books_df.loc[len(books_df)] = new_df
+    #         print('Book added successfully')
+    #     except Exception as e:
+    #         print('Failed to add books to book_df')
+    #         return e;
+
     # reader object 생성
     reader = Reader(rating_scale=(1, 5))
 

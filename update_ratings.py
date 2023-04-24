@@ -4,12 +4,12 @@ import json
 import xmltodict
 from datetime import datetime
 
-def update_popular_books(isForced):
+def update_ratings(isForced):
     # XML 데이터 가져오기
     libraryUrl = "http://data4library.kr/api/loanItemSrch?authKey=32bb82a55e2ccb6dd8baec16309bed7ecc2985e9a07e83dc18b5037179636d55&startDt=2023-01-01&endDt=2023-04-01"
     # headers = {'Content-Type': 'application/json', 'charset': 'UTF-8', 'Accept': '*/*'}
 
-    postData = {'url':libraryUrl}
+    postData = {'url': libraryUrl}
     response = requests.post('http://43.200.106.28:4000/library', json=postData)
 
     xml_data = xmltodict.parse(response.text)
