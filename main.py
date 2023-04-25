@@ -8,7 +8,7 @@ app.config['JSON_AS_ASCII'] = False
 
 popular_books_total_num = update_popular_books(False)
 #print(content_algorithm_db([9791130627984, 9791160022490], 10))
-print(collab_algorithm_db(2, 5))
+print(collab_algorithm_db("0a547b05-d29b-49b5-8a37-f44684c1a332", 5))
 
 # Headers는 'Content-Type': 'application/json'
 # Body는 JSON 형식으로 요청
@@ -35,7 +35,7 @@ def content():
 def collab():
     if request.method == "POST":
         try:
-            user_id = int(request.json['user_id'])
+            user_id = request.json['user_id']
             result_num = request.json.get('result_num', 10)
 
         except KeyError:
