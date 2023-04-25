@@ -28,34 +28,43 @@ def collab_algorithm_db(user_id, result_num=10):
 
     print(ratings_df)
 
-    # Convert the data to a Surprise dataset
+    # Surprise dataset으로 변환
     reader = Reader(rating_scale=(1, 10))
     dataset = Dataset.load_from_df(ratings_df[['user_id', 'book_isbn', 'review_rating']], reader)
 
-    # Split the data into training and test sets
+    # training으로 dataset을 나누고 테스트하기
     trainset, testset = train_test_split(dataset, test_size=0.2)
 
-    # Train an SVD model on the training set
+    # training set에서 SVD model train
     model = SVD()
     model.fit(trainset)
 
-    # Get the user's ratings
+    # 유저의 도서 isbn과 별점 가져오기
     user_ratings = ratings_df.loc[ratings_df['user_id'] == user_id, ['book_isbn', 'review_rating']]
 
-    # Predict ratings for all books
+    # 모든 책에 대해 별점 예측하기
     all_books = ratings_df['book_isbn'].unique()
     predictions = []
     for book in all_books:
         prediction = model.predict(user_id, book)
-        predictions.append(book)
+        #predictions.append(book)
         # 점수도 함께 저장
-        # predictions.append((book, prediction.est))
+        predictions.append((book, prediction.est))
 
     # Sort the predictions by predicted rating
     predictions.sort(key=lambda x: x[1], reverse=True)
 
+    limited_predictions = predictions[:result_num]
+
+    recommended_books = []
+    for isbn_val_set in limited_predictions:
+        recommended_books.append(isbn_val_set[0])
+
+    if result_num > len(recommended_books):
+        result_num = len(recommended_books)
+
     # Get the top recommended books
-    recommended_books = predictions[:result_num]
+    # recommended_books = predicted_isbns[:result_num]
 
     # # Get the book information from the original dataframe
     # recommended_books_info = []
