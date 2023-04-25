@@ -9,6 +9,8 @@ import sqlite3
 
 import warnings
 
+from get_review_data import get_review_data
+
 
 warnings.filterwarnings("ignore")
 
@@ -16,31 +18,22 @@ def collab_algorithm_db(user_id, result_num=10):
     conn = sqlite3.connect('res/books.db')
 
     # rating csv 파일 일기
-    ratings_df = pd.read_csv('res/ratings_final_ISBN3.csv')
+    # ratings_df = pd.read_csv('res/ratings_final_ISBN3.csv')
+
+    review_json = get_review_data()
+
+    ratings_df = pd.DataFrame.from_dict(review_json)
+
+    print(ratings_df)
 
     # db에서 도서 정보 불러와 df으로 할당
     books_df = pd.read_sql_query('SELECT * FROM popular_books', conn)
-
-    # cur = conn.cursor()
-    # cur.execute("SELECT attribute FROM MyTable")
-    # values = cur.fetchall()
-
-    # for isbn in favorites:
-    #     book_data = get_book(isbn)
-    #     try:
-    #         new_df = [int(book_data.get('isbn13')), book_data.get('bookname'), book_data.get('authors'), book_data.get('publisher'), book_data.get('class_no'), book_data.get('class_nm'), book_data.get('bookImageURL'), '0']
-    #         print(new_df)
-    #         books_df.loc[len(books_df)] = new_df
-    #         print('Book added successfully')
-    #     except Exception as e:
-    #         print('Failed to add books to book_df')
-    #         return e;
 
     # reader object 생성
     reader = Reader(rating_scale=(1, 5))
 
     # surprise Dataset에 reader 넣기
-    data = Dataset.load_from_df(ratings_df[['userId', 'isbn13', 'rating']], reader)
+    data = Dataset.load_from_df(ratings_df[['user_id', 'book_isbn', 'review_rating']], reader)
 
     # SVD model
     svd = SVD()
@@ -48,7 +41,7 @@ def collab_algorithm_db(user_id, result_num=10):
     svd.fit(trainset)
 
     # 모든 책을 isbn으로 가져오기
-    all_books = list(set(ratings_df['isbn13'].unique()).intersection(set(books_df['isbn13'].unique())))
+    all_books = list(set(ratings_df['book_isbn'].unique()).intersection(set(books_df['isbn13'].unique())))
 
     # 입력 받은 user에 대해 도서 isbn과 평점 리스트 생성
     user_estimates = []
@@ -61,17 +54,12 @@ def collab_algorithm_db(user_id, result_num=10):
 
     # 위에서부터 n개 도서 가져오기
     recommended_books = []
-    # for i in range(result_num):
-    #     isbn = sorted_estimates[i][0]
-    #     bookname = books_df.loc[books_df['isbn13'] == isbn, 'bookname'].iloc[0]
-    #     recommended_books.append({"isbn13": int(isbn), "bookname": str(bookname)})
 
     if result_num > len(sorted_estimates):
         result_num = len(sorted_estimates)
 
     for i in range(result_num):
         isbn = sorted_estimates[i][0]
-        # book_info = books_df.loc[books_df['isbn13'] == isbn].iloc[0].to_dict()
         book_info = books_df.loc[books_df['isbn13'] == isbn, ['isbn13', 'bookname', 'authors', 'publisher', 'class_no', 'class_nm', 'bookImageURL']].iloc[0].to_dict()
         recommended_books.append(book_info)
 
