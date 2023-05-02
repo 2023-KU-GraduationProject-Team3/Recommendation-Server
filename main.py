@@ -13,6 +13,22 @@ print(collab_algorithm_db("0a547b05-d29b-49b5-8a37-f44684c1a332", 5))
 # Headers는 'Content-Type': 'application/json'
 # Body는 JSON 형식으로 요청
 
+@app.route("/update", methods=["GET"])
+def update():
+    if request.method == "GET":
+        try:
+            update_popular_books(True)
+
+        except KeyError:
+            return jsonify({'error': 'Invalid request. Parameter "isbn" missing in request body.'}), 400
+
+        content_result = content_algorithm_db(isbns, result_num)
+
+        return content_result, 201
+
+    else:
+        return jsonify({"message": "Wrong access"}), 401
+
 @app.route("/api/content", methods=["GET", "POST"])
 def content():
 
@@ -29,7 +45,7 @@ def content():
         return content_result, 201
 
     else:
-        return jsonify({"message": "Wrong access"}), 200
+        return jsonify({"message": "Wrong access"}), 401
 
 @app.route("/api/collab", methods=["GET", "POST"])
 def collab():
@@ -46,7 +62,7 @@ def collab():
         return collab_result, 201
 
     else:
-        return jsonify({"message": "Wrong access"}), 200
+        return jsonify({"message": "Wrong access"}), 401
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)

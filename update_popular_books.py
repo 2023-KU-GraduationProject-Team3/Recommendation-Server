@@ -2,23 +2,26 @@ import requests
 import sqlite3
 import json
 import xmltodict
-from datetime import datetime
+import uuid
+from datetime import datetime, date, timedelta
 
 def update_popular_books(isForced):
-    # XML 데이터 가져오기
-    libraryUrl = "http://data4library.kr/api/loanItemSrch?authKey=32bb82a55e2ccb6dd8baec16309bed7ecc2985e9a07e83dc18b5037179636d55&startDt=2023-01-01&endDt=2023-04-01"
-    # headers = {'Content-Type': 'application/json', 'charset': 'UTF-8', 'Accept': '*/*'}
 
-    postData = {'url':libraryUrl}
-    response = requests.post('http://43.200.106.28:4000/library', json=postData)
+    # 오늘 날짜
+    today = date.today()
 
-    xml_data = xmltodict.parse(response.text)
+    # 어제 날짜
+    yesterday = today - timedelta(days=1)
+    # 어제 날짜 변수
+    yesterday_date = yesterday.strftime("%Y-%m-%d")
 
-    jsonData = json.dumps(xml_data, ensure_ascii=False)
+    # 2년 전 날짜
+    two_years_ago = yesterday - timedelta(days=365 * 2)
+    # 2년 전 날짜 변수
+    two_years_ago_date = two_years_ago.strftime("%Y-%m-%d")
 
-    jsonObject = json.loads(jsonData)
-
-    docs = jsonObject.get("response").get("docs")
+    # 추천에 활용할 책 개수
+    book_num = 5000
 
     # SQLite database 연결
     conn = sqlite3.connect('res/books.db')
@@ -27,7 +30,8 @@ def update_popular_books(isForced):
     # 테이블 생성
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS popular_books (
-            isbn13 INTEGER PRIMARY KEY,
+            id TEXT PRIMARY KEY,
+            isbn13 INTEGER,
             bookname TEXT,
             authors TEXT,
             publisher TEXT,
@@ -41,13 +45,25 @@ def update_popular_books(isForced):
     nowdate = datetime.now().date()
 
     # 이전에 업데이트 했던 날짜와 같지 않을 때만 실행
-    if isForced or str(cursor.execute('SELECT createdAt from popular_books LIMIT 1').fetchone()[0]) != str(nowdate):
+    if isForced or int(cursor.execute('SELECT COUNT(*) FROM popular_books').fetchone()[0]) == 0 or str(cursor.execute('SELECT createdAt from popular_books LIMIT 1').fetchone()[0]) != str(nowdate):
+
+        # XML 데이터 가져오기
+        libraryUrl = f"http://data4library.kr/api/loanItemSrch?authKey=32bb82a55e2ccb6dd8baec16309bed7ecc2985e9a07e83dc18b5037179636d55&startDt={two_years_ago_date}&endDt={yesterday_date}&pageSize={book_num}"
+
+        print(libraryUrl)
+        postData = {'url': libraryUrl}
+        response = requests.post('http://43.200.106.28:4000/library', json=postData)
+        xml_data = xmltodict.parse(response.text)
+        jsonData = json.dumps(xml_data, ensure_ascii=False)
+        jsonObject = json.loads(jsonData)
+        docs = jsonObject.get("response").get("docs")
 
         # 테이블에서 모두 삭제
         cursor.execute('DELETE from popular_books')
 
         # 테이블에 삽입
         for item in docs.get("doc"):
+            id = str(uuid.uuid4())
             isbn13 = int(item.get("isbn13"))
             bookname = item.get("bookname")
             authors = item.get("authors")
@@ -57,9 +73,9 @@ def update_popular_books(isForced):
             bookImageURL = item.get("bookImageURL")
             createdAt = nowdate
             cursor.execute('''
-                INSERT INTO popular_books (isbn13, bookname, authors, publisher, class_no, class_nm, bookImageURL, createdAt)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (isbn13, bookname, authors, publisher, class_no, class_nm, bookImageURL, createdAt))
+                INSERT INTO popular_books (id, isbn13, bookname, authors, publisher, class_no, class_nm, bookImageURL, createdAt)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (id, isbn13, bookname, authors, publisher, class_no, class_nm, bookImageURL, createdAt))
 
         print("Data saved successfully!")
 
