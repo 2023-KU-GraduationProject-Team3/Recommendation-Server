@@ -22,7 +22,7 @@ def update():
         except Exception as e:
             return jsonify({'error': str(e)}), 400
 
-        return result, 201
+        return str(result), 201
 
     else:
         return jsonify({"message": "Wrong access"}), 401
