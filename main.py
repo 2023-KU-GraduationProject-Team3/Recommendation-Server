@@ -29,7 +29,6 @@ def update():
 
 @app.route("/api/content", methods=["GET", "POST"])
 def content():
-
     if request.method == "POST":
         try:
             isbns = request.json['isbn']
