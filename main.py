@@ -17,14 +17,12 @@ print(collab_algorithm_db("0a547b05-d29b-49b5-8a37-f44684c1a332", 5))
 def update():
     if request.method == "GET":
         try:
-            update_popular_books(True)
+            result = update_popular_books(True)
 
-        except KeyError:
-            return jsonify({'error': 'Invalid request. Parameter "isbn" missing in request body.'}), 400
+        except Exception as e:
+            return jsonify({'error': str(e)}), 400
 
-        content_result = content_algorithm_db(isbns, result_num)
-
-        return content_result, 201
+        return result, 201
 
     else:
         return jsonify({"message": "Wrong access"}), 401
