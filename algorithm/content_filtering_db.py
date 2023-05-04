@@ -8,6 +8,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from scipy.sparse import hstack
 import json
 import sqlite3
+import numpy as np
 from get_book import get_book
 
 import warnings
@@ -18,17 +19,17 @@ warnings.filterwarnings("ignore")
 def content_algorithm_db(favorites, result_num):
     conn = sqlite3.connect('res/books.db')
 
-    books_df = pd.read_sql_query('SELECT * FROM popular_books', conn)
+    books_df = pd.read_sql_query('SELECT isbn13, bookname, authors, publisher, class_no, class_nm, bookImageURL, createdAt FROM popular_books', conn)
 
     for isbn in favorites:
         book_data = get_book(isbn)
         try:
-            new_df = [int(book_data.get('isbn13')), book_data.get('bookname'), book_data.get('authors'), book_data.get('publisher'), book_data.get('class_no'), book_data.get('class_nm'), book_data.get('bookImageURL'), '0']
-            print(new_df)
+            new_df = [int(book_data.get('isbn13')), book_data.get('bookname'),book_data.get('authors'), book_data.get('publisher'), book_data.get('class_no'), book_data.get('class_nm'), book_data.get('bookImageURL'), '0']
             books_df.loc[len(books_df)] = new_df
-            print('Book added successfully')
+            #print('Book added successfully')
         except Exception as e:
             print('Failed to add books to book_df')
+            print(str(e))
             return e;
 
     books_df['same_author'] = books_df.apply(lambda x: x['authors'] if x['authors'] == x['authors'] else '', axis=1)
@@ -45,10 +46,10 @@ def content_algorithm_db(favorites, result_num):
     tfidf_bookname_matrix = tfidf_bookname.fit_transform(books_df['bookname'])
 
     tfidf_author = TfidfVectorizer(stop_words='english')
-    tfidf_author_matrix = tfidf_author.fit_transform(books_df['same_author'])
+    tfidf_author_matrix = tfidf_author.fit_transform([str(val) for val in books_df['same_author'] if val is not np.nan])
 
     tfidf_publisher = TfidfVectorizer(stop_words='english')
-    tfidf_publisher_matrix = tfidf_publisher.fit_transform(books_df['same_publisher'])
+    tfidf_publisher_matrix = tfidf_publisher.fit_transform([str(val) for val in books_df['same_publisher'] if val is not np.nan])
 
     tfidf_class_nm = TfidfVectorizer(stop_words='english')
     tfidf_class_nm_matrix = tfidf_class_nm.fit_transform(books_df['class_nm'].values.astype('U'))
